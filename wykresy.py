@@ -5,7 +5,7 @@ from scipy.stats import spearmanr
 import glob
 import os
 
-csv_files = glob.glob(os.path.join("results", "results_*.csv"))
+csv_files = glob.glob(os.path.join("results1", "results_*.csv"))
 
 df_list = [pd.read_csv(f) for f in csv_files]
 df = pd.concat(df_list, ignore_index=True)
@@ -13,7 +13,19 @@ df = pd.concat(df_list, ignore_index=True)
 correlations = {
     "cpu_utilization": [],
     "memory_utilization": [],
-    "rt": []
+    "rt": [],
+    "rpc_rt": [],
+    "http_rt": [],
+    "mq_rt": []
+}
+
+mcr_map = {
+    "cpu_utilization": "mcr",
+    "memory_utilization": "mcr",
+    "rt": "mcr",
+    "rpc_rt": "rpc_mcr",
+    "http_rt": "http_mcr",
+    "mq_rt": "mq_mcr"
 }
 # df['timestamp'] = pd.to_datetime(df['timestamp'], unit='ms', errors='coerce')
 # df['timestamp_10min'] = df['timestamp'].dt.floor('10h')
@@ -32,7 +44,7 @@ for ms, group in grouped:
     # if group.shape[0] < 500:
         if len(group) >= 2:
             for col in correlations:
-                corr, _ = spearmanr(group["mcr"], group[col])
+                corr, _ = spearmanr(group[mcr_map[col]], group[col])
                 if not np.isnan(corr):
                     correlations[col].append(corr)
 

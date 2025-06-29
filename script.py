@@ -52,11 +52,21 @@ def process_data(start, end):
     rt_cols = [col for col in df_rtmcr.columns if col.endswith("_rt")]
     mcr_cols = [col for col in df_rtmcr.columns if col.endswith("_mcr")]
 
+    rpc_rt_cols = [col for col in df_rtmcr.columns if col.endswith("rpc_rt")]
+    rpc_mcr_cols = [col for col in df_rtmcr.columns if col.endswith("rpc_mcr")]
+
+    mq_rt_cols = [col for col in df_rtmcr.columns if col.endswith("mq_rt")]
+    mq_mcr_cols = [col for col in df_rtmcr.columns if col.endswith("mq_mcr")]
+
     df_rtmcr["rt"] = df_rtmcr[rt_cols].sum(axis=1)
     df_rtmcr["mcr"] = df_rtmcr[mcr_cols].sum(axis=1)
+    df_rtmcr["rpc_rt"] = df_rtmcr[rpc_rt_cols].sum(axis=1)
+    df_rtmcr["rpc_mcr"] = df_rtmcr[rpc_mcr_cols].sum(axis=1)
+    df_rtmcr["mq_rt"] = df_rtmcr[mq_rt_cols].sum(axis=1)
+    df_rtmcr["mq_mcr"] = df_rtmcr[mq_mcr_cols].sum(axis=1)
 
     df_rtmcr_grouped = (
-        df_rtmcr.groupby(["timestamp", "msinstanceid"])[["rt", "mcr"]]
+        df_rtmcr.groupby(["timestamp", "msinstanceid"])[["rt", "mcr", "http_mcr", "http_rt", "rpc_rt", "rpc_mcr", "mq_rt", "mq_mcr"]]
         .sum()
         .reset_index()
     )
@@ -71,7 +81,7 @@ def process_data(start, end):
     df_final["msinstanceid"] = df_final["msinstanceid"].str.extract(r"(MS_\d+)", expand=False)
 
     df_agg = (
-        df_final.groupby(["timestamp", "msinstanceid"])[["rt", "mcr", "cpu_utilization", "memory_utilization"]]
+        df_final.groupby(["timestamp", "msinstanceid"])[["rt", "mcr", "cpu_utilization", "memory_utilization", "http_mcr", "http_rt", "rpc_rt", "rpc_mcr", "mq_rt", "mq_mcr"]]
         .mean()
         .reset_index()
     )
